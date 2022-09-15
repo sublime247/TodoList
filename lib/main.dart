@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sectodo/model/todo_class.dart';
+import 'package:sectodo/model/todo_provider.dart';
 // import 'package:intl/intl.dart';
 import 'package:sectodo/widgets/inputwidgets.dart';
 
@@ -12,57 +14,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Second Todo App',
-      home: HomePage(),
+    return ChangeNotifierProvider(
+      create: (context) => Todos(),
+      child: MaterialApp(
+        title: 'Second Todo App',
+        home: HomePage(),
+      ),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  List<TodoModel> todos = [];
-  final TextEditingController _text = TextEditingController();
-  final TextEditingController _startTime = TextEditingController();
-  final TextEditingController _endTime = TextEditingController();
-
-  void addTodos() {
-    int id = todos.length;
-    int ids = id++;
-
-    final newInstanceOfTodo =
-        TodoModel(ids, _text.text, _startTime.text, _endTime.text);
-    if (_text.text.isEmpty) {
-      return;
-    }
-    if (_startTime.text.isEmpty) {
-      return;
-    }
-    if (_endTime.text.isEmpty) {
-      return;
-    }
-    Navigator.of(context).pop();
-    setState(() {
-      todos.add(newInstanceOfTodo);
-      _text.clear();
-      _startTime.clear();
-      _endTime.clear();
-    });
-  }
-
-  deleteTodo(int id) {
-    setState(() {
-      todos.removeWhere((todo) => todo.id == id);
-    });
-  }
-
   void showInputField(BuildContext context) {
+    final provider = Provider.of<Todos>(context, listen: false);
     showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
@@ -77,8 +43,8 @@ class _HomePageState extends State<HomePage> {
                   child: TextField(
                     decoration: const InputDecoration(
                         labelText: 'Enter-Todo', hintText: 'To-do'),
-                    controller: _text,
-                    onSubmitted: (_) => addTodos(),
+                    controller: provider.text,
+                    onSubmitted: (_) => provider.addTodos(),
                   ),
                 ),
                 Row(
@@ -92,8 +58,8 @@ class _HomePageState extends State<HomePage> {
                           child: TextField(
                             decoration:
                                 const InputDecoration(hintText: "00:00 Am"),
-                            controller: _startTime,
-                            onSubmitted: (_) => addTodos(),
+                            controller: provider.startTime,
+                            onSubmitted: (_) => provider.addTodos(),
                           ),
                         )
                       ],
@@ -106,8 +72,8 @@ class _HomePageState extends State<HomePage> {
                           child: TextField(
                             decoration:
                                 const InputDecoration(hintText: "00:00 Am"),
-                            controller: _endTime,
-                            onSubmitted: (_) => addTodos(),
+                            controller: provider.endTime,
+                            onSubmitted: (_) => provider.addTodos(),
                           ),
                         )
                       ],
@@ -117,9 +83,13 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   margin: const EdgeInsets.only(top: 15.00),
                   child: TextButton(
-                    
-                    onPressed: addTodos,
-                   child: const Text('Add To List')),
+                      onPressed: () 
+
+                      {  
+                        provider.addTodos;
+                        // Navigator.of(context).pop();
+                      },
+                      child: const Text('Add To List')),
                 )
               ],
             ),
@@ -129,6 +99,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<Todos>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('My To-do'),
@@ -140,8 +111,8 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             UserInput(
-              deletetodo: deleteTodo,
-              todos: todos,
+              deletetodo: provider.deleteTodo,
+              todos: provider.todos,
             ),
             FloatingActionButton(
                 onPressed: () => showInputField(context),

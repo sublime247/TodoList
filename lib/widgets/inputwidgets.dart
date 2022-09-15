@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sectodo/model/todo_class.dart';
+
+import '../model/todo_provider.dart';
 // import 'package:intl/intl.dart';
 
 class UserInput extends StatelessWidget {
@@ -9,6 +12,7 @@ class UserInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     final provider = Provider.of<Todos>(context);
     return SizedBox(
       height: 400,
       child: ListView.builder(
